@@ -1,5 +1,8 @@
 'use strict';
 
+var zoom = 'hour';
+var selectedContainerId = null;
+
 var unitRound = function(i) {
     return parseFloat(Math.round(i * 100) / 100).toFixed(2);
 };
@@ -47,26 +50,60 @@ var renderLatestStats = function(containerId) {
 };
 
 var renderChart = function(elementId, containerId, chart) {
-    $.get('/rs/container/'+containerId+'/'+chart, function(stats) {
+    var url;
+    if (containerId) {
+        url = '/rs/container/'+containerId+'/'+chart+'/'+zoom;
+    } else {
+        url = '/rs/all/'+chart+'/'+zoom;
+    }
+    $.get(url, function(stats) {
+        $('#'+elementId).show();
+        $('#'+elementId+'-warn').hide();
+        if (stats.length <= 1) {
+            $('#'+elementId).hide();
+            $('#'+elementId+'-warn').show();
+            return;
+        }
         var data = google.visualization.arrayToDataTable(stats);
         var options = {
-            legend: { position: 'bottom' }
+            legend: { position: 'right' }
         };
         var chart = new google.visualization.LineChart(document.getElementById(elementId));
         chart.draw(data, options);
     });
 };
 
-var selectContainer = function(id, name) {
-    $('#selected-container').text('Selected container: ' + (name ? name : id) + ' (click to change)');
-    $('#container-list-collapse').collapse('hide');
-    $('#container-stats').show();
+var renderContainerStats = function(id) {
     renderLatestStats(id);
     renderChart('mem-chart', id, 'mem');
     renderChart('net-in-chart', id, 'net_in');
     renderChart('net-out-chart', id, 'net_out');
     renderChart('block-in-chart', id, 'block_in');
-    renderChart('block-out-chart', id, 'block_in');
+    renderChart('block-out-chart', id, 'block_out');
+};
+
+var selectContainer = function(id, name) {
+    $('#selected-container').text('Selected container: ' + (name ? name : id) + ' (click to change)');
+    $('#container-list-collapse').collapse('hide');
+    $('#container-stats').show();
+    renderContainerStats(id);
+    selectedContainerId = id;
+};
+
+var renderAllContainerStats = function() {
+    renderChart('mem-chart', null, 'mem');
+    renderChart('net-in-chart', null, 'net_in');
+    renderChart('net-out-chart', null, 'net_out');
+    renderChart('block-in-chart', null, 'block_in');
+    renderChart('block-out-chart', null, 'block_out');
+};
+
+var reRenderCharts = function() {
+    if (selectedContainerId) {
+        renderContainerStats(selectedContainerId);
+    } else {
+        renderAllContainerStats();
+    }
 };
 
 var addItemToContainerList = function(list, container) {
@@ -98,10 +135,25 @@ var loadContainerList = function() {
     });
 };
 
+var onZoomButtonClick = function(level) {
+    zoom = level;
+    $('#zoom-buttons > button').removeClass('btn-primary');
+    $('#zoom-'+level).addClass('btn-primary');
+    reRenderCharts();
+};
+
+var initZoomButton = function() {
+    $('#zoom-hour').click(function() { onZoomButtonClick('hour'); });
+    $('#zoom-day').click(function() { onZoomButtonClick('day'); });
+    $('#zoom-week').click(function() { onZoomButtonClick('week'); });
+    $('#zoom-month').click(function() { onZoomButtonClick('month'); });
+};
+
 var init = function() {
     google.charts.load('current', {packages: ['corechart']});
+    initZoomButton();
     loadContainerList();
-    //google.charts.setOnLoadCallback(drawChart
+    renderAllContainerStats();
 };
 
 $(document).ready(init);

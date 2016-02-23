@@ -11,6 +11,12 @@
     <body>
         <div class="container">
             <div class="header clearfix">
+                <div class="btn-group pull-right" role="group" id="zoom-buttons">
+                    <button type="button" class="btn btn-default btn-primary" id="zoom-hour">Hour</button>
+                    <button type="button" class="btn btn-default" id="zoom-day">Day</button>
+                    <button type="button" class="btn btn-default" id="zoom-week">Week</button>
+                    <button type="button" class="btn btn-default" id="zoom-month">Month</button>
+                </div>
                 <h3 class="text-muted">
                     Docker Container Stats
                     <span class="glyphicon glyphicon-stats"></span>
@@ -60,21 +66,32 @@
                     </tbody>
                 </table>
                 <div class="divider"></div>
-                <h4>Mem</h4>
-                <div id="mem-chart" class="chart"></div>
-                <div class="divider"></div>
-                <h4>Net In</h4>
-                <div id="net-in-chart" class="chart"></div>
-                <div class="divider"></div>
-                <h4>Net Out</h4>
-                <div id="net-out-chart" class="chart"></div>
-                <div class="divider"></div>
-                <h4>Block In</h4>
-                <div id="block-in-chart" class="chart"></div>
-                <div class="divider"></div>
-                <h4>Block Out</h4>
-                <div id="block-out-chart" class="chart"></div>
             </div>
+            
+            <h4>Mem</h4>
+            <div id="mem-chart" class="chart"></div>
+            <div class="alert alert-warning chart-warn" id="mem-chart-warn" role="alert">No data for specified zoom level.</div>
+            <div class="divider"></div>
+            
+            <h4>Net In</h4>
+            <div id="net-in-chart" class="chart"></div>
+            <div class="alert alert-warning chart-warn" id="net-in-chart-warn" role="alert">No data for specified zoom level.</div>
+            <div class="divider"></div>
+            
+            <h4>Net Out</h4>
+            <div id="net-out-chart" class="chart"></div>
+            <div class="alert alert-warning chart-warn" id="net-out-chart-warn" role="alert">No data for specified zoom level.</div>
+            <div class="divider"></div>
+            
+            <h4>Block In</h4>
+            <div id="block-in-chart" class="chart"></div>
+            <div class="alert alert-warning chart-warn" id="block-in-chart-warn" role="alert">No data for specified zoom level.</div>
+            <div class="divider"></div>
+            
+            <h4>Block Out</h4>
+            <div id="block-out-chart" class="chart"></div>
+            <div class="alert alert-warning chart-warn" id="block-out-chart-warn" role="alert">No data for specified zoom level.</div>
+            
         </div>
         <script src="js/jquery-2.2.1.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
