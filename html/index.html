@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Docker Container Stats</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="header clearfix">
+                <h3 class="text-muted">
+                    Docker Container Stats
+                    <span class="glyphicon glyphicon-stats"></span>
+                </h3>
+            </div>
+            <div class="panel-group" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" aria-expanded="true" href="#container-list-collapse">
+                                <span id="selected-container">Containers</span>
+                                <span class="caret"></span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="panel-collapse collapse in" role="tabpanel" id="container-list-collapse">
+                        <div class="panel-body">
+                            <table class="table" id="container-list">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="container-stats" style="display:none">
+                <h4>Latest</h4>
+                <table class="table" id="container-stats-latest">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>CPU</th>
+                            <th>Mem</th>
+                            <th>Net In</th>
+                            <th>Net Out</th>
+                            <th>Block In</th>
+                            <th>Block Out</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div class="divider"></div>
+                <h4>Mem</h4>
+                <div id="mem-chart" class="chart"></div>
+                <div class="divider"></div>
+                <h4>Net In</h4>
+                <div id="net-in-chart" class="chart"></div>
+                <div class="divider"></div>
+                <h4>Net Out</h4>
+                <div id="net-out-chart" class="chart"></div>
+                <div class="divider"></div>
+                <h4>Block In</h4>
+                <div id="block-in-chart" class="chart"></div>
+                <div class="divider"></div>
+                <h4>Block Out</h4>
+                <div id="block-out-chart" class="chart"></div>
+            </div>
+        </div>
+        <script src="js/jquery-2.2.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="js/script.js"></script>
+    </body>
+</html>

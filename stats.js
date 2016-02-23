@@ -1,7 +1,7 @@
 var DB_FILE = 'db/netstats.db';
 var DOCKER = '/usr/bin/docker';
 var INTERVAL = 60;
-var TEST = true;
+var TEST = false;
 
 var sqlite3 = require('sqlite3').verbose();
 var exec = require('child_process').execFileSync;
@@ -16,7 +16,7 @@ var getContainers = function() {
     if (TEST) {
         out = fs.readFileSync('test/docker_ps.txt', {encoding: 'utf-8'});
     } else {
-        out = spawn(DOCKER, ['ps', '-a']).stdout;
+        out = spawn(DOCKER, ['ps', '-a']).stdout.toString();
     }
     var lines = out.split('\n');
     for (var i=0; i<lines.length; i++) {
@@ -53,7 +53,7 @@ var addNetworkStats = function(containers) {
     if (TEST) {
         out = fs.readFileSync('test/docker_stats.txt', {encoding: 'utf-8'});
     } else {
-        out = spawn(DOCKER, ['stats', '-a', '--no-stream']).stdout;
+        out = spawn(DOCKER, ['stats', '-a', '--no-stream']).stdout.toString();
     }
     var lines = out.split('\n');
     for (var i=0; i<lines.length; i++) {
@@ -106,7 +106,6 @@ var main = function() {
     var containers = getContainers();
     addNetworkStats(containers);
     writeStats(containers);
-    console.log('.');
 };
 
 db.run("CREATE TABLE IF NOT EXISTS containers ( " +
