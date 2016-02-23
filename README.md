@@ -17,3 +17,10 @@ docker run \
 Mounting the volumes /var/lib/docker and /var/run/docker.sock (read-only) is required so that the docker container can retrieve the statistics for the containers.
 
 Mounting the volume /opt/docker-stats/db is optional. You can use it if you want to persist the SQLite database.
+
+## Screenshots
+![All containers' memory usage](https://raw.githubusercontent.com/virtualzone/docker-container-stats/img/master/img/all-containers-mem.png)
+
+![All containers' inbound network traffic](https://raw.githubusercontent.com/virtualzone/docker-container-stats/img/master/img/all-containers-net.png)
+
+![Selected container's latest statistics](https://raw.githubusercontent.com/virtualzone/docker-container-stats/img/master/img/selected-container.png)
