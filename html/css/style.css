@@ -27,6 +27,14 @@
     border-bottom: 1px solid #e5e5e5;
 }
 
+footer {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
 @media (min-width: 768px) {
     .container {
         max-width: 730px;
