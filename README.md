@@ -3,7 +3,7 @@ A web interface for viewing historical and current statistics per docker contain
 
 Pull and run daemonized:
 ```
-docker pull virtualzone/docker-container-stats
+docker pull weweave/docker-container-stats
 docker run \
         -d \
         -p 8080:8080 \
@@ -11,16 +11,20 @@ docker run \
         --volume=/var/run/docker.sock:/var/run/docker.sock:ro \
         --volume=/home/docker/storage/stats/db:/opt/docker-stats/db \
         --name stats \
-        virtualzone/docker-container-stats
+        weweave/docker-container-stats
 ```
+
+To view your stats, open a web browser and visit http://localhost:8080 (replace localhost with your docker host's hostname or ip address).
 
 Mounting the volumes /var/lib/docker and /var/run/docker.sock (read-only) is required so that the docker container can retrieve the statistics for the containers.
 
 Mounting the volume /opt/docker-stats/db is optional. You can use it if you want to persist the SQLite database.
 
+We strongly recommend not making your stats available online. To password protect your statistics, you can use a frontend web server/proxy (Apache, nginx, ...).
+
 ## Screenshots
-![All containers' memory usage](https://raw.githubusercontent.com/virtualzone/docker-container-stats/master/img/all-containers-mem.png)
+![All containers' memory usage](https://raw.githubusercontent.com/weweave/docker-container-stats/master/img/all-containers-mem.png)
 
-![All containers' inbound network traffic](https://raw.githubusercontent.com/virtualzone/docker-container-stats/master/img/all-containers-net.png)
+![All containers' inbound network traffic](https://raw.githubusercontent.com/weweave/docker-container-stats/master/img/all-containers-net.png)
 
-![Selected container's latest statistics](https://raw.githubusercontent.com/virtualzone/docker-container-stats/master/img/selected-container.png)
+![Selected container's latest statistics](https://raw.githubusercontent.com/weweave/docker-container-stats/master/img/selected-container.png)
