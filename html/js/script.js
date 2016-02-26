@@ -40,7 +40,7 @@
     };
 
     var renderLatestStats = function(containerId) {
-        $.get('/rs/container/'+containerId+'/stats/latest', function(data) {
+        $.get('./rs/container/'+containerId+'/stats/latest', function(data) {
             var list = $('#container-stats-latest > tbody');
             list.empty();
             for (var i=0; i<data.length; i++) {
@@ -53,9 +53,9 @@
     var renderChart = function(elementId, containerId, chart) {
         var url;
         if (containerId) {
-            url = '/rs/container/'+containerId+'/'+chart+'/'+zoom;
+            url = './rs/container/'+containerId+'/'+chart+'/'+zoom;
         } else {
-            url = '/rs/all/'+chart+'/'+zoom;
+            url = './rs/all/'+chart+'/'+zoom;
         }
         $.get(url, function(stats) {
             $('#'+elementId).show();
@@ -125,7 +125,7 @@
     };
 
     var loadContainerList = function() {
-        $.get('/rs/containers/get', function(data) {
+        $.get('./rs/containers/get', function(data) {
             var list = $('#container-list > tbody');
             for (var i=0; i<data.length; i++) {
                 var container = data[i];
