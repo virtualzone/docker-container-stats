@@ -1,4 +1,4 @@
-var DB_FILE = 'db/netstats.db';
+var DB_FILE = 'db/stats.db';
 var DOCKER = '/usr/bin/docker';
 var INTERVAL = 60;
 var TEST = false;
@@ -48,7 +48,7 @@ var getBytes = function(s) {
     return bytes;
 };
 
-var addNetworkStats = function(containers) {
+var addStatsToContainerList = function(containers) {
     var out;
     if (TEST) {
         out = fs.readFileSync('test/docker_stats.txt', {encoding: 'utf-8'});
@@ -84,14 +84,26 @@ var addNetworkStats = function(containers) {
     }
 };
 
-var writeContainerStats = function(id, container, now) {
-    var stm;
-    stm = db.prepare("INSERT OR IGNORE INTO containers (id, name) VALUES (?, ?)");
-    stm.run(id, container.name);
-    stm = db.prepare("INSERT INTO stats (id, ts, cpu, mem, net_in, net_out, block_in, block_out) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    stm.run(id, now, container.cpu, container.mem, container.net.in, container.net.out, container.block.in, container.block.out);
-    stm.finalize();
+var getCreateContainerId = function(name, cid, cb) {
+    if (!name) name = cid;
+    db.get("SELECT id FROM containers WHERE name = ? LIMIT 1", name, function(err, row) {
+        if (row) {
+            cb(row.id);
+        } else {
+            db.run("INSERT INTO containers (name) VALUES (?)", name, function() {
+                cb(this.lastID);
+            });
+        }
+    });
+};
+
+var writeContainerStats = function(cid, container, now) {
+    getCreateContainerId(container.name, cid, function(id) {
+        var stm = db.prepare("INSERT INTO stats (id, ts, cpu, mem, net_in, net_out, block_in, block_out) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        stm.run(id, now, container.cpu, container.mem, container.net.in, container.net.out, container.block.in, container.block.out);
+        stm.finalize();
+    });
 };
 
 var writeStats = function(containers) {
@@ -104,16 +116,16 @@ var writeStats = function(containers) {
 
 var main = function() {
     var containers = getContainers();
-    addNetworkStats(containers);
+    addStatsToContainerList(containers);
     writeStats(containers);
 };
 
 db.run("CREATE TABLE IF NOT EXISTS containers ( " +
-    "id TEXT NOT NULL PRIMARY KEY, " +
+    "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
     "name TEXT NOT NULL)");
 
 db.run("CREATE TABLE IF NOT EXISTS stats ( " +
-    "id TEXT NOT NULL, " +
+    "id INTEGER NOT NULL, " +
     "ts DATETIME NOT NULL, " +
     "cpu REAL NOT NULL, " +
     "mem REAL NOT NULL, " +

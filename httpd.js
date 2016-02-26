@@ -1,4 +1,4 @@
-var DB_FILE = 'db/netstats.db';
+var DB_FILE = 'db/stats.db';
 
 var sqlite3 = require('sqlite3');
 var bodyParser = require('body-parser');
@@ -25,15 +25,16 @@ var getMinDate = function(zoom) {
 
 var processPreResult = function(result, containers, preResult) {
     var timestamps = [];
-    for (var ts in preResult) {
+    var ts;
+    for (ts in preResult) {
         timestamps.push(ts);
     }
     timestamps.sort();
     for (var k=0; k<timestamps.length; k++) {
-        var ts = timestamps[k];
+        ts = timestamps[k];
         result.push([ts]);
         for (var i=0; i<containers.length; i++) {
-            result[k+1].push(preResult[ts][containers[i].id]);
+            result[k+1].push(preResult[ts][containers[i].id] ? preResult[ts][containers[i].id] : 0);
         }
     }
 };
@@ -64,7 +65,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("html"));
 
 app.get("/rs/containers/get", function(req, res) {
-    db.all("SELECT * FROM containers ORDER BY name, id ASC", function(err, rows) {
+    db.all("SELECT * FROM containers ORDER BY name ASC", function(err, rows) {
         res.json(rows);
     });
 });
@@ -80,7 +81,7 @@ app.get("/rs/container/:id/:chart/:zoom", function(req, res) {
     var zoom = req.params.zoom;
     if (!isValidChart(chart) || !isValidZoom(zoom)) {
         return res.json([]);
-    };
+    }
     var minDate = getMinDate(zoom);
     db.all("SELECT ts, "+chart+" FROM stats WHERE id = ? AND ts >= ? ORDER BY ts ASC", req.params.id, minDate, function(err, rows) {
         var json = [['Time', 'Bytes']];
@@ -98,11 +99,11 @@ app.get("/rs/all/:chart/:zoom", function(req, res) {
     var zoom = req.params.zoom;
     if (!isValidChart(chart) || !isValidZoom(zoom)) {
         return res.json([]);
-    };
+    }
     var minDate = getMinDate(zoom);
-    db.all("SELECT * FROM containers ORDER BY name, id ASC", function(err, containers) {
+    db.all("SELECT * FROM containers ORDER BY name ASC", function(err, containers) {
         var result = [['Time']];
-        if (containers.length == 0) {
+        if (containers.length === 0) {
             res.json(result);
             return;
         }
