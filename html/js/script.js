@@ -51,6 +51,7 @@
     };
 
     var renderChart = function(elementId, containerId, chart) {
+        console.log('Rendering chart '+chart+' for container ' + containerId);
         var url;
         if (containerId) {
             url = './rs/container/'+containerId+'/'+chart+'/'+zoom;
@@ -75,6 +76,7 @@
     };
 
     var renderContainerStats = function(id) {
+        console.log('Rendering stats for container ' + id);
         renderLatestStats(id);
         renderChart('mem-chart', id, 'mem');
         renderChart('net-in-chart', id, 'net_in');
@@ -92,6 +94,7 @@
     };
 
     var renderAllContainerStats = function() {
+        console.log('Rendering all container stats');
         renderChart('mem-chart', null, 'mem');
         renderChart('net-in-chart', null, 'net_in');
         renderChart('net-out-chart', null, 'net_out');
@@ -124,7 +127,7 @@
         list.append(tr);
     };
 
-    var loadContainerList = function() {
+    var loadContainerList = function(cb) {
         $.get('./rs/containers/get', function(data) {
             var list = $('#container-list > tbody');
             for (var i=0; i<data.length; i++) {
@@ -149,10 +152,12 @@
     };
 
     var init = function() {
-        google.charts.load('current', {packages: ['corechart']});
         initZoomButton();
         loadContainerList();
-        google.charts.setOnLoadCallback(renderAllContainerStats);
+        google.charts.load('44', {
+            packages: ['corechart'],
+            callback: renderAllContainerStats
+        });
     };
 
     $(document).ready(init);
