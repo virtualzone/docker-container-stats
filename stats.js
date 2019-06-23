@@ -120,6 +120,8 @@ var main = function() {
     writeStats(containers);
 };
 
+db.run("PRAGMA journal_mode=WAL");
+
 db.run("CREATE TABLE IF NOT EXISTS containers ( " +
     "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
     "name TEXT NOT NULL)");

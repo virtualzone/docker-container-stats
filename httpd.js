@@ -7,7 +7,7 @@ var moment = require('moment');
 var express = require("express");
 
 var app = express();
-var db = new sqlite3.Database(DB_FILE);
+var db = new sqlite3.Database(DB_FILE, sqlite3.OPEN_READONLY));
 
 var isValidChart = function(s) {
     return /^(net_in|net_out|block_in|block_out|mem)$/.test(s);
