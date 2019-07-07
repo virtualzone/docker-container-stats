@@ -14,6 +14,23 @@ docker run \
         weweave/docker-container-stats
 ```
 
+Docker-Compose:
+
+```
+version: '3.6'
+services:
+  stats:
+    image: weweave/docker-container-stats
+    container_name: 'stats'
+    ports:
+      - '8080:8080'
+    volumes:
+      - '/var/lib/docker/:/var/lib/docker:ro'
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - '/home/docker/storage/stats/db:/opt/docker-stats/db'
+```
+
+
 To view your stats, open a web browser and visit http://localhost:8080 (replace localhost with your docker host's hostname or ip address).
 
 Mounting the volumes /var/lib/docker and /var/run/docker.sock (read-only) is required so that the docker container can retrieve the statistics for the containers.
