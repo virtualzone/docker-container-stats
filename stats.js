@@ -4,7 +4,6 @@ var INTERVAL = 60;
 var TEST = false;
 
 var sqlite3 = require('sqlite3').verbose();
-var exec = require('child_process').execFileSync;
 var spawn = require('child_process').spawnSync;
 var moment = require('moment');
 var fs = require('fs');

@@ -1,0 +1,21 @@
+image: virtualzone/docker-container-stats:latest
+manifests:
+  - image: virtualzone/docker-container-stats:amd64
+    platform:
+      architecture: amd64
+      os: linux
+  - image: virtualzone/docker-container-stats:arm32v6
+    platform:
+      architecture: arm
+      os: linux
+      variant: v6
+  - image: virtualzone/docker-container-stats:arm32v7
+    platform:
+      architecture: arm
+      os: linux
+      variant: v7
+  - image: virtualzone/docker-container-stats:arm64v8
+    platform:
+      architecture: arm64
+      os: linux
+      variant: v8

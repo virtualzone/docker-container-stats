@@ -3,7 +3,7 @@ A web interface for viewing historical and current statistics per docker contain
 
 Pull and run daemonized:
 ```
-docker pull weweave/docker-container-stats
+docker pull virtualzone/docker-container-stats
 docker run \
         -d \
         -p 8080:8080 \
@@ -11,7 +11,7 @@ docker run \
         --volume=/var/run/docker.sock:/var/run/docker.sock:ro \
         --volume=/home/docker/storage/stats/db:/opt/docker-stats/db \
         --name stats \
-        weweave/docker-container-stats
+        virtualzone/docker-container-stats
 ```
 
 Docker-Compose:
@@ -20,7 +20,7 @@ Docker-Compose:
 version: '3.6'
 services:
   stats:
-    image: weweave/docker-container-stats
+    image: virtualzone/docker-container-stats
     container_name: 'stats'
     ports:
       - '8080:8080'
@@ -40,8 +40,8 @@ Mounting the volume /opt/docker-stats/db is optional. You can use it if you want
 We strongly recommend not making your stats available online. To password protect your statistics, you can use a frontend web server/proxy (Apache, nginx, ...).
 
 ## Screenshots
-![All containers' memory usage](https://raw.githubusercontent.com/weweave/docker-container-stats/master/img/all-containers-mem.png)
+![All containers' memory usage](https://raw.githubusercontent.com/virtualzone/docker-container-stats/master/img/all-containers-mem.png)
 
-![All containers' inbound network traffic](https://raw.githubusercontent.com/weweave/docker-container-stats/master/img/all-containers-net.png)
+![All containers' inbound network traffic](https://raw.githubusercontent.com/virtualzone/docker-container-stats/master/img/all-containers-net.png)
 
-![Selected container's latest statistics](https://raw.githubusercontent.com/weweave/docker-container-stats/master/img/selected-container.png)
+![Selected container's latest statistics](https://raw.githubusercontent.com/virtualzone/docker-container-stats/master/img/selected-container.png)
