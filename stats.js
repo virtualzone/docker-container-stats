@@ -9,33 +9,11 @@ var moment = require('moment');
 var fs = require('fs');
 var db = new sqlite3.Database(DB_FILE);
 
-var getContainers = function() {
-    var containers = {};
-    var out;
-    if (TEST) {
-        out = fs.readFileSync('test/docker_ps.txt', {encoding: 'utf-8'});
-    } else {
-        out = spawn(DOCKER, ['ps', '-a']).stdout.toString();
-    }
-    var lines = out.split('\n');
-    for (var i=0; i<lines.length; i++) {
-        var line = lines[i];
-        var columns = line.split(/\s{3,}/g);
-        if (i > 0 && columns.length >= 2) {
-            containers[columns[0]] = {
-                'name': columns[columns.length-1]
-            };
-        }
-    }
-    return containers;
-};
-
 var getBytes = function(s) {
-    var tokens = s.split(' ');
     var bytes = 0;
-    var unit = tokens[1].trim();
-    var value = tokens[0].trim();
-    if (unit == 'kB') {
+    var value = s.match(/\d+/g)[0];
+    var unit = s.match(/[a-zA-Z]+/g)[0].toUpperCase();
+    if (unit == 'KB') {
         return value*1024;
     } else if (unit == 'MB') {
         return value*1024*1024;
@@ -47,12 +25,13 @@ var getBytes = function(s) {
     return bytes;
 };
 
-var addStatsToContainerList = function(containers) {
+var getContainers = function() {
+    var containers = {};
     var out;
     if (TEST) {
         out = fs.readFileSync('test/docker_stats.txt', {encoding: 'utf-8'});
     } else {
-        out = spawn(DOCKER, ['stats', '-a', '--no-stream']).stdout.toString();
+        out = spawn(DOCKER, ['stats', '-a', '--no-stream', '--format', 'table {{.ID}}\t{{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}']).stdout.toString();
     }
     var lines = out.split('\n');
     for (var i=0; i<lines.length; i++) {
@@ -62,25 +41,30 @@ var addStatsToContainerList = function(containers) {
             if (columns.length >= 6) {
                 var containerId = columns[0];
                 if (containerId) {
-                    var cpu = columns[1];
-                    var mem = columns[2];
+                    var name = columns[1];
+                    var cpu = columns[2];
+                    var mem = columns[3];
                     var net = columns[4];
                     var block = columns[5];
-                    
-                    containers[containerId].cpu = cpu.replace('%', '');
-                    containers[containerId].mem = getBytes(mem.split(' / ')[0]);
-                    containers[containerId].net = {
-                        'in': getBytes(net.split(' / ')[0]),
-                        'out': getBytes(net.split(' / ')[1])
-                    };
-                    containers[containerId].block = {
-                        'in': getBytes(block.split(' / ')[0]),
-                        'out': getBytes(block.split(' / ')[1])
+
+                    containers[containerId] = {
+                        'name': name,
+                        'cpu': cpu.replace('%', ''),
+                        'mem': getBytes(mem.split(' / ')[0]),
+                        'net': {
+                            'in': getBytes(net.split(' / ')[0]),
+                            'out': getBytes(net.split(' / ')[1])
+                        },
+                        'block': {
+                            'in': getBytes(block.split(' / ')[0]),
+                            'out': getBytes(block.split(' / ')[1])
+                        }
                     };
                 }
             }
         }
     }
+    return containers;
 };
 
 var getCreateContainerId = function(name, cid, cb) {
@@ -115,8 +99,8 @@ var writeStats = function(containers) {
 
 var main = function() {
     var containers = getContainers();
-    addStatsToContainerList(containers);
     writeStats(containers);
+    setTimeout(main, INTERVAL*1000);
 };
 
 db.run("PRAGMA journal_mode=WAL");
@@ -135,4 +119,4 @@ db.run("CREATE TABLE IF NOT EXISTS stats ( " +
     "block_in REAL NOT NULL, " +
     "block_out REAL NOT NULL)");
 
-setInterval(main, INTERVAL*1000);
+main();

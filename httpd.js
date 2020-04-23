@@ -2,7 +2,6 @@ var DB_FILE = 'db/stats.db';
 
 var sqlite3 = require('sqlite3');
 var bodyParser = require('body-parser');
-var exec = require('child_process').execFileSync;
 var moment = require('moment');
 var express = require("express");
 
