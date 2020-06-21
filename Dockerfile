@@ -1,4 +1,4 @@
-FROM amd64/alpine:3.11
+FROM amd64/alpine:latest
 ARG BUILD_DATE
 ARG VCS_REF
 LABEL org.label-schema.build-date=$BUILD_DATE \
@@ -26,4 +26,4 @@ ADD html/ /opt/docker-stats/html/
 ADD supervisord.conf /etc/supervisord.conf
 
 EXPOSE 8080
-CMD ["/usr/bin/supervisord"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
