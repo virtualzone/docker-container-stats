@@ -26,13 +26,13 @@
                 <div class="panel panel-default">
                     <div class="panel-heading" role="tab">
                         <h4 class="panel-title">
-                            <a role="button" data-toggle="collapse" aria-expanded="true" href="#container-list-collapse">
+                            <a role="button" data-toggle="collapse" aria-expanded="false" href="#container-list-collapse">
                                 <span id="selected-container">Containers</span>
                                 <span class="caret"></span>
                             </a>
                         </h4>
                     </div>
-                    <div class="panel-collapse collapse in" role="tabpanel" id="container-list-collapse">
+                    <div class="panel-collapse collapse" aria-expanded="false" role="tabpanel" id="container-list-collapse">
                         <div class="panel-body">
                             <table class="table" id="container-list">
                                 <thead>
@@ -66,6 +66,10 @@
                 </table>
                 <div class="divider"></div>
             </div>
+            
+            <h4>Cpu</h4>
+            <div id="cpu-chart" class="chart"></div>
+            <div class="alert alert-warning chart-warn" id="cpu-chart-warn" role="alert">No data for specified zoom level.</div>
             
             <h4>Mem</h4>
             <div id="mem-chart" class="chart"></div>
