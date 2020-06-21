@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  web:
+    image: "build"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "/var/lib/docker/:/var/lib/docker:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./html:/opt/docker-stats/html"
+    ports:
+      - 8080:8080/tcp
+    networks:
+      - network
+    environment: 
+      - "STATS_INTERVAL=5"
+      - "CLEANUP_DAYS=7"
+
+networks:
+  network:
