@@ -1,0 +1,25 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/repo
+    resource_class: small
+    docker:
+      - image: circleci/buildpack-deps:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Connect to Docker Hub
+          command: docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
+      - run:
+          name: Build docker stats container
+          command: |
+            bin/buildscript.sh stats --push
+      
+# workflow for this project
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+          context: build
