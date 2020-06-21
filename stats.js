@@ -1,7 +1,9 @@
 var DB_FILE = 'db/stats.db';
 var DOCKER = '/usr/bin/docker';
-var INTERVAL = 60;
-var TEST = false;
+
+var TEST = process.env.TEST || false
+var INTERVAL = process.env.STATS_INTERVAL || 60;
+var CLEANUP_DAYS = process.env.CLEANUP_DAYS || 32;
 
 var sqlite3 = require('sqlite3').verbose();
 var spawn = require('child_process').spawnSync;
@@ -12,14 +14,16 @@ var db = new sqlite3.Database(DB_FILE);
 var getBytes = function(s) {
     var bytes = 0;
     var value = s.match(/\d+/g)[0];
-    var unit = s.match(/[a-zA-Z]+/g)[0].toUpperCase();
-    if (unit == 'KB') {
+    var unit = s.match(/[a-zA-Z]+/g)[0];
+    if (unit == 'B') {
+        return value;
+    } else if (unit == 'KB' || unit == 'KiB') {
         return value*1024;
-    } else if (unit == 'MB') {
+    } else if (unit == 'MB' || unit == 'MiB') {
         return value*1024*1024;
-    } else if (unit == 'GB') {
+    } else if (unit == 'GB' || unit == 'GiB') {
         return value*1024*1024*1024;
-    } else if (unit == 'TB') {
+    } else if (unit == 'TB' || unit == 'TiB') {
         return value*1024*1024*1024*1024;
     }
     return bytes;
@@ -31,7 +35,7 @@ var getContainers = function() {
     if (TEST) {
         out = fs.readFileSync('test/docker_stats.txt', {encoding: 'utf-8'});
     } else {
-        out = spawn(DOCKER, ['stats', '-a', '--no-stream', '--format', 'table {{.ID}}\t{{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}']).stdout.toString();
+        out = spawn(DOCKER, ['stats', '--no-stream', '--format', 'table {{.ID}}\t{{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}']).stdout.toString();
     }
     var lines = out.split('\n');
     for (var i=0; i<lines.length; i++) {
@@ -41,7 +45,8 @@ var getContainers = function() {
             if (columns.length >= 6) {
                 var containerId = columns[0];
                 if (containerId) {
-                    var name = columns[1];
+                    // split by '.', used by docker swarm mode
+                    var name = columns[1].split('.')[0];
                     var cpu = columns[2];
                     var mem = columns[3];
                     var net = columns[4];
@@ -100,7 +105,46 @@ var writeStats = function(containers) {
 var main = function() {
     var containers = getContainers();
     writeStats(containers);
+    cleanupContainers(containers);
     setTimeout(main, INTERVAL*1000);
+};
+
+var cleanupContainers = function (activeContainers) {
+    // get list of active containers
+    var list = [];
+    for (var key in activeContainers) {
+        var container = activeContainers[key].name;
+        list.push(`'${container}'`);
+    }
+    
+    // skip if no active list, probably its initializing
+    if (!list.length) {
+        return;
+    }
+
+    // ids
+    var ids = list.join(',');
+
+    // delete all non-active containers
+    var sql = `DELETE FROM containers WHERE name NOT IN (${ids})`;
+    db.all(sql, function (err, rows) {
+        handleError(err);
+        // delete stats on these containers
+        db.all('DELETE FROM stats WHERE ID NOT in (SELECT id FROM containers)', function (err, rows) {
+            handleError(err);
+            // cleanup old stats
+            var old = moment().subtract(CLEANUP_DAYS, 'days').format('YYYY-MM-DD HH:mm:ss');
+            db.all('DELETE FROM stats WHERE ts < ?', old, function (err, result) {
+                handleError(err);
+            });
+        });
+    });
+};
+
+var handleError = function (error) {
+    if (error) {
+        console.error(error);
+    }
 };
 
 db.run("PRAGMA journal_mode=WAL");
@@ -119,4 +163,4 @@ db.run("CREATE TABLE IF NOT EXISTS stats ( " +
     "block_in REAL NOT NULL, " +
     "block_out REAL NOT NULL)");
 
-main();
+setTimeout(main, INTERVAL * 1000);
