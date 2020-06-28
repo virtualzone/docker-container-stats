@@ -13,13 +13,13 @@ var getBytes = function(s) {
     var bytes = 0;
     var value = s.match(/\d+/g)[0];
     var unit = s.match(/[a-zA-Z]+/g)[0].toUpperCase();
-    if (unit == 'KB') {
+    if (unit == 'KB' || unit == 'KIB') {
         return value*1024;
-    } else if (unit == 'MB') {
+    } else if (unit == 'MB' || unit == 'MIB') {
         return value*1024*1024;
-    } else if (unit == 'GB') {
+    } else if (unit == 'GB' || unit == 'GIB') {
         return value*1024*1024*1024;
-    } else if (unit == 'TB') {
+    } else if (unit == 'TB' || unit == 'TIB') {
         return value*1024*1024*1024*1024;
     }
     return bytes;
