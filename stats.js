@@ -1,6 +1,6 @@
 var DB_FILE = 'db/stats.db';
 var DOCKER = '/usr/bin/docker';
-var INTERVAL = 60;
+var INTERVAL = process.env.STATS_UPDATE_INTERVAL || 60;
 var TEST = false;
 
 var sqlite3 = require('sqlite3').verbose();
