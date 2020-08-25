@@ -163,4 +163,5 @@
     };
 
     $(document).ready(init);
+    setInterval(reRenderCharts, 3000);
 }());
