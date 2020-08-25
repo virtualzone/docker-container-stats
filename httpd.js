@@ -83,7 +83,7 @@ app.get("/rs/container/:id/:chart/:zoom", function(req, res) {
     }
     var minDate = getMinDate(zoom);
     db.all("SELECT ts, "+chart+" FROM stats WHERE id = ? AND ts >= ? ORDER BY ts ASC", req.params.id, minDate, function(err, rows) {
-        var json = [['Time', 'Bytes']];
+        var json = [['Time', chart == 'cpu' ? 'CPU %' : 'Bytes']];
         var prev = 0;
         for (var i=0; i<rows.length; i++) {
             json.push([rows[i].ts, (!rows[i][chart] ? prev : rows[i][chart])]);
