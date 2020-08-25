@@ -78,6 +78,7 @@
     var renderContainerStats = function(id) {
         console.log('Rendering stats for container ' + id);
         renderLatestStats(id);
+        renderChart('cpu-chart', id, 'cpu');
         renderChart('mem-chart', id, 'mem');
         renderChart('net-in-chart', id, 'net_in');
         renderChart('net-out-chart', id, 'net_out');
@@ -95,6 +96,7 @@
 
     var renderAllContainerStats = function() {
         console.log('Rendering all container stats');
+        renderChart('cpu-chart', null, 'cpu');
         renderChart('mem-chart', null, 'mem');
         renderChart('net-in-chart', null, 'net_in');
         renderChart('net-out-chart', null, 'net_out');
