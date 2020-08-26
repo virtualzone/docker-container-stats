@@ -11,6 +11,7 @@ docker run \
         --volume=/var/run/docker.sock:/var/run/docker.sock:ro \
         --volume=/home/docker/storage/stats/db:/opt/docker-stats/db \
         --name stats \
+        -e STATS_UPDATE_INTERVAL=10 \
         virtualzone/docker-container-stats
 ```
 
@@ -24,6 +25,8 @@ services:
     container_name: 'stats'
     ports:
       - '8080:8080'
+    environment:
+      STATS_UPDATE_INTERVAL: 10
     volumes:
       - '/var/lib/docker/:/var/lib/docker:ro'
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
