@@ -7,7 +7,6 @@ docker pull virtualzone/docker-container-stats
 docker run \
         -d \
         -p 8080:8080 \
-        --volume=/var/lib/docker/:/var/lib/docker:ro \
         --volume=/var/run/docker.sock:/var/run/docker.sock:ro \
         --volume=/home/docker/storage/stats/db:/opt/docker-stats/db \
         --name stats \
@@ -28,7 +27,6 @@ services:
     environment:
       STATS_UPDATE_INTERVAL: 10
     volumes:
-      - '/var/lib/docker/:/var/lib/docker:ro'
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
       - '/home/docker/storage/stats/db:/opt/docker-stats/db'
 ```
@@ -36,7 +34,7 @@ services:
 
 To view your stats, open a web browser and visit http://localhost:8080 (replace localhost with your docker host's hostname or ip address).
 
-Mounting the volumes /var/lib/docker and /var/run/docker.sock (read-only) is required so that the docker container can retrieve the statistics for the containers.
+Mounting the volume /var/run/docker.sock (read-only) is required so that the docker container can retrieve the statistics for the containers.
 
 Mounting the volume /opt/docker-stats/db is optional. You can use it if you want to persist the SQLite database.
 

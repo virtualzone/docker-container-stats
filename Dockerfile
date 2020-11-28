@@ -1,4 +1,4 @@
-FROM amd64/alpine:3.11
+FROM amd64/alpine:3.12
 ARG BUILD_DATE
 ARG VCS_REF
 LABEL org.label-schema.build-date=$BUILD_DATE \
