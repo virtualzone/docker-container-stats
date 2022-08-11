@@ -1,9 +1,9 @@
-FROM alpine:3.12 AS qemu
+FROM alpine:3.16 AS qemu
 RUN apk --update add --no-cache curl
 RUN cd /tmp && \
     curl -L https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz | tar zxvf - -C . && mv qemu-3.0.0+resin-arm/qemu-arm-static .
 
-FROM arm32v6/alpine:3.12
+FROM arm32v6/alpine:3.16
 COPY --from=qemu /tmp/qemu-arm-static /usr/bin/
 ARG BUILD_DATE
 ARG VCS_REF
