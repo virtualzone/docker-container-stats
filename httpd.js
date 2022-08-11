@@ -16,6 +16,34 @@ var isValidZoom = function(s) {
     return /^(hour|day|week|month)$/.test(s);
 };
 
+var thinOutRows = function(rows, chart, maxNum) {
+    if (rows.length <= maxNum) {
+        return rows;
+    }
+    var factor = Math.ceil(rows.length / maxNum);
+
+    var res = [];
+    var index = 0;
+    while (index < rows.length - factor) {
+        var subArr = rows.slice(index, index + factor)
+        var stat = {};
+
+        stat['ts'] = subArr[0].ts;
+        stat[chart] = subArr[0][chart] ?? 0;
+
+        for (var i = 1; i < factor; ++i) {
+            var checkValue = subArr[i][chart] ?? 0;
+            if (checkValue > stat[chart]) {
+                stat['ts'] = subArr[i].ts;
+                stat[chart] = checkValue;
+            }
+        }
+        res.push(stat)
+        index += factor;
+    }
+    return res;
+}
+
 var getMinDate = function(zoom) {
     var now = moment();
     now.subtract(1, zoom + 's');
@@ -44,6 +72,9 @@ var processNextContainer = function(result, preResult, containers, j, minDate, c
     result[0].push(name ? name : id);
     db.all("SELECT ts, "+chart+" FROM stats WHERE id = ? AND ts >= ? ORDER BY ts ASC", id, minDate, function(err, rows) {
         var prev = 0;
+
+        rows = thinOutRows(rows, chart, 1000);
+
         for (var i=0; i<rows.length; i++) {
             if (!preResult.hasOwnProperty(rows[i].ts)) {
                 preResult[rows[i].ts] = {};
@@ -85,6 +116,9 @@ app.get("/rs/container/:id/:chart/:zoom", function(req, res) {
     db.all("SELECT ts, "+chart+" FROM stats WHERE id = ? AND ts >= ? ORDER BY ts ASC", req.params.id, minDate, function(err, rows) {
         var json = [['Time', chart == 'cpu' ? 'CPU %' : 'Bytes']];
         var prev = 0;
+
+        rows = thinOutRows(rows, chart, 1000);
+
         for (var i=0; i<rows.length; i++) {
             json.push([rows[i].ts, (!rows[i][chart] ? prev : rows[i][chart])]);
             if (rows[i][chart]) prev = rows[i][chart];
