@@ -89,6 +89,15 @@ var writeContainerStats = function(cid, container, now) {
     });
 };
 
+var clearOldContainerStats = function() {
+    var stm = db.prepare("DELETE FROM stats WHERE ts < ?");
+    var now = moment();
+    now.subtract(1, 'months');
+    var time = now.format('YYYY-MM-DD HH:mm:ss');
+    stm.run(time)
+    stm.finalize();
+}
+
 var writeStats = function(containers) {
     var now = moment().format('YYYY-MM-DD HH:mm:ss');
     for (var id in containers) {
@@ -101,6 +110,7 @@ var main = function() {
     var containers = getContainers();
     writeStats(containers);
     setTimeout(main, INTERVAL*1000);
+    setInterval(clearOldContainerStats, 24 * 60 * 60 * 1000); // Daily removal of old stats
 };
 
 db.run("PRAGMA journal_mode=WAL");
