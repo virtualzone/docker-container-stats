@@ -17,7 +17,7 @@ RUN apk --update add --no-cache \
 
 RUN mkdir -p /opt/docker-stats/db
 RUN apk --update add --no-cache --virtual .build-deps \
-    make python2 gcc g++ libc-dev && \
+    make python3 gcc g++ libc-dev && \
     cd /opt/docker-stats && \
     npm update && \
     npm install express sqlite3 body-parser moment --build-from-source=sqlite3 && \
